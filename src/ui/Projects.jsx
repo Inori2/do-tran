@@ -6,39 +6,58 @@ export default function Projects() {
   const [selectedProject, setSelectedProject] = useState(null);
   const scrollContainerRef = useRef(null);
 
-  // Duplicate the projects 3x to allow seamless looping
+  // --- Duplicate the projects 3x to allow seamless looping ---
   const infiniteProjects = useMemo(
     () => [...projects, ...projects, ...projects],
     [projects]
   );
 
-  // When user scrolls too far left or right, reset position to middle
+  // --- Infinite scroll effect (to the right only) ---
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const handleScroll = () => {
       const scrollWidth = container.scrollWidth;
-      const viewportWidth = window.innerWidth;
+      const viewportWidth = container.offsetWidth;
       const third = scrollWidth / 3;
+      const buffer = 50; // small threshold
 
-      // If user scrolls too far to the left
-      if (container.scrollLeft < third / 2) {
-        container.scrollLeft += third;
-      }
-      // If user scrolls too far to the right
-      else if (container.scrollLeft > third * 1.5) {
-        container.scrollLeft -= third;
+      // If user goes too far right → reset back one third forward
+      if (container.scrollLeft >= third * 2 - viewportWidth - buffer) {
+        const offset = container.scrollLeft - third; // maintain momentum
+        container.style.scrollBehavior = "auto";
+        container.scrollLeft = offset - third; // shift back one set
+        container.style.scrollBehavior = "";
       }
     };
 
+    // Start in the first third so movement always feels rightward
+    container.scrollLeft = 0;
+
     container.addEventListener("scroll", handleScroll);
-
-    // Set initial scroll to the middle duplicate
-    container.scrollLeft = container.scrollWidth / 3;
-
     return () => container.removeEventListener("scroll", handleScroll);
   }, [infiniteProjects]);
+
+  // --- Trackpad & Mouse Wheel Scroll ---
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault(); // prevent vertical page scroll
+
+      // Detect if horizontal (deltaX) or vertical (deltaY) scroll is dominant
+      const scrollAmount =
+        Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+
+      // Move horizontally
+      container.scrollLeft += scrollAmount;
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, []);
 
   if (loading) return <p>Loading projects...</p>;
 
@@ -66,7 +85,7 @@ export default function Projects() {
           </div>
         </div>
 
-        {/* Gallery */}
+        {/* Gallery Section */}
         {selectedProject.data.gallery?.length > 0 && (
           <div className="gallery flex gap-4 h-1/4 px-20 justify-center">
             {selectedProject.data.gallery.map((item, index) => (
@@ -83,12 +102,21 @@ export default function Projects() {
     );
   }
 
-  // --- Default View: Infinite horizontal scroll ---
+  // --- Default View: Infinite Horizontal Scroll + Trackpad Support ---
   return (
     <section className="gallery w-screen h-screen overflow-hidden">
       <div
         ref={scrollContainerRef}
-        className="projects w-screen h-screen overflow-x-scroll overflow-y-hidden scrollbar-hide px-5 py-20"
+        className="
+          projects
+          w-screen
+          h-screen
+          overflow-x-scroll
+          overflow-y-hidden
+          no-scrollbar
+          px-5
+          py-20
+        "
       >
         <div
           className="grid grid-rows-3 grid-flow-col gap-20 h-full w-max"
@@ -101,10 +129,10 @@ export default function Projects() {
           {infiniteProjects.map((project, index) => (
             <div
               key={`${project.id}-${index}`}
-              className="cursor-pointer flex-shrink-0"
+              className="cursor-pointer flex-shrink-0 h-full px-5"
               style={{
                 width: `calc((100vw - (6 * 1.25rem)) / 7)`, // 7 columns
-                height: `calc((100vh - (2 * 5rem) - (2 * 1.25rem)) / 3)`, // 3 rows
+                // 3 rows
               }}
               onClick={() => setSelectedProject(project)}
             >

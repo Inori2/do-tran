@@ -14,4 +14,13 @@
   body {
     @apply w-screen h-screen overflow-x-scroll bg-neutral-50;
   }
+  /* globals.css */
+  .no-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 }
