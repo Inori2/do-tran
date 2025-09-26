@@ -6,7 +6,10 @@ export default function Navbar() {
   const instaRef = useRef(null);
   return (
     <>
-      <header className="w-screen h-fit p-5 flex justify-between items-center text-neutral-50 fixed mix-blend-difference z-40">
+      <header
+        className="w-screen h-fit p-5 flex justify-between items-center text-neutral-50 fixed top-0 mix-blend-difference z-40"
+        data-speed="0"
+      >
         <div className="nav-container flex items-baseline gap-2">
           <div
             className="text-container uppercase font-bold text-base"

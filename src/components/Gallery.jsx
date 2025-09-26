@@ -1,67 +1,95 @@
 import { useState, useEffect, useRef } from "react";
 import { useProjects } from "../hooks/useProjects";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollTrigger, ScrollSmoother } from "gsap/all";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 export default function Projects({ isPreloaderDone }) {
   const { projects, loading } = useProjects();
   const [selectedProject, setSelectedProject] = useState(null);
+  const gridRef = useRef(null);
   const projectRefs = useRef([]);
 
-  /**
-   * --- Initial Stagger Animation After Preloader ---
-   */
   useEffect(() => {
-    if (
-      !loading &&
-      projects.length > 0 &&
-      isPreloaderDone &&
-      selectedProject === null
-    ) {
-      const elements = projectRefs.current;
+    if (loading || !isPreloaderDone || !projects.length || selectedProject)
+      return;
 
-      // Reset all items to hidden state
-      gsap.set(elements, { clipPath: "inset(0% 0% 100% 0%)" });
+    // ------------------ ScrollSmoother ------------------
+    const smoother = ScrollSmoother.create({
+      smooth: 1,
+      effects: true,
+      normalizeScroll: true,
+      content: ".scroll-content", // ONLY scrollable content
+    });
 
-      // Initial stagger reveal animation
-      const tl = gsap.timeline({
-        onComplete: () => {
-          // After stagger finishes, enable ScrollTrigger animations
-          elements.forEach((el) => {
-            ScrollTrigger.create({
-              trigger: el,
-              start: "top 80%", // when item comes into view
-              onEnter: () => {
-                gsap.to(el, {
-                  clipPath: "inset(0% 0% 0% 0%)",
-                  duration: 1,
-                  ease: "power3.inOut",
-                });
-              },
-            });
+    const items = projectRefs.current;
+
+    // ------------------ Initial Stagger Reveal ------------------
+    gsap.set(items, { clipPath: "inset(0% 0% 100% 0%)" });
+    const tl = gsap.timeline({
+      onComplete: () => {
+        items.forEach((el) => {
+          ScrollTrigger.create({
+            trigger: el,
+            start: "top 80%",
+            onEnter: () => {
+              gsap.to(el, {
+                clipPath: "inset(0% 0% 0% 0%)",
+                duration: 1,
+                ease: "power3.inOut",
+              });
+            },
           });
-        },
-      });
+        });
+      },
+    });
+    tl.to(items, {
+      clipPath: "inset(0% 0% 0% 0%)",
+      duration: 1,
+      ease: "power3.inOut",
+      stagger: { amount: 1, from: "start" },
+    });
 
-      tl.to(elements, {
-        clipPath: "inset(0% 0% 0% 0%)",
-        duration: 1,
-        ease: "power3.inOut",
-        stagger: {
-          amount: 1, // total stagger time
-          from: "start",
-        },
-      });
-    }
+    // ------------------ Lag per item ------------------
+    const baseLag = 0.5;
+    const lagScale = 0.13;
+    items.forEach((item, i) => {
+      const lag = baseLag + (i % 3) * lagScale; // approximate column lag
+      smoother.effects(item, { speed: 1, lag });
+    });
+
+    // ------------------ Scroll velocity scaling ------------------
+    const minScaleX = 0.7;
+    const maxScaleY = 1.7;
+    const threshold = 700;
+    const scrollSensitivity = 4000;
+
+    const updateScale = () => {
+      const rawVel = smoother.getVelocity();
+      const absVel = Math.abs(rawVel);
+      const vRaw = Math.max(0, absVel - threshold);
+      const v = Math.min(vRaw / scrollSensitivity, 1);
+
+      const si = 1 + (minScaleX - 1) * v;
+      const sy = 1 + (maxScaleY - 1) * v;
+      const origin = rawVel < 0 ? "50% 0%" : "50% 100%";
+
+      gridRef.current.style.setProperty("--si", si);
+      gridRef.current.style.setProperty("--sy", sy);
+      gridRef.current.style.setProperty("--to", origin);
+    };
+
+    gsap.ticker.add(updateScale);
+
+    return () => {
+      smoother.kill();
+      gsap.ticker.remove(updateScale);
+    };
   }, [loading, projects, isPreloaderDone, selectedProject]);
 
   if (loading) return <p>Loading projects...</p>;
 
-  /**
-   * --- Detail View ---
-   */
   if (selectedProject) {
     return (
       <div className="project-details w-full h-screen px-5 py-20">
@@ -71,8 +99,6 @@ export default function Projects({ isPreloaderDone }) {
         >
           ← Back
         </button>
-
-        {/* Main Thumbnail */}
         <div className="w-full flex flex-col h-2/3 py-5 items-center">
           {selectedProject.data.thumbnail?.url && (
             <img
@@ -82,8 +108,6 @@ export default function Projects({ isPreloaderDone }) {
             />
           )}
         </div>
-
-        {/* Gallery Section */}
         {selectedProject.data.gallery?.length > 0 && (
           <div className="gallery flex gap-4 h-1/4 px-20 justify-center">
             {selectedProject.data.gallery.map((item, index) => (
@@ -100,34 +124,32 @@ export default function Projects({ isPreloaderDone }) {
     );
   }
 
-  /**
-   * --- Default View: Grid of Thumbnails ---
-   */
   return (
-    <section className="gallery w-full max-w-[100vw] px-5 py-20">
-      <div className="projects w-full h-full">
-        <div className="w-full grid grid-cols-3 sm:grid-cols-7 gap-5 md:gap-10 lg:gap-20">
-          {projects.map((project, index) => (
-            <div
-              key={project.id || index}
-              ref={(el) => (projectRefs.current[index] = el)}
-              className="cursor-pointer overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)]"
-              onClick={() => setSelectedProject(project)}
-            >
-              {project.data.thumbnail?.url ? (
-                <img
-                  src={project.data.thumbnail.url}
-                  alt="Thumbnail"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">No Thumbnail</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+    <section className="gallery w-full max-w-[100vw] px-5 py-20 overflow-x-hidden bg-neutral-50">
+      <div
+        ref={gridRef}
+        className="projects w-full h-full grid grid-cols-3 sm:grid-cols-7 gap-5 md:gap-10 lg:gap-20"
+      >
+        {projects.map((project, index) => (
+          <div
+            key={project.id || index}
+            ref={(el) => (projectRefs.current[index] = el)}
+            className="grid__item cursor-pointer overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)] transform-gpu"
+            onClick={() => setSelectedProject(project)}
+          >
+            {project.data.thumbnail?.url ? (
+              <img
+                src={project.data.thumbnail.url}
+                alt="Thumbnail"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500 text-sm">No Thumbnail</span>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </section>
   );

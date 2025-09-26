@@ -29,9 +29,10 @@ export default function App() {
       )}
 
       <Navbar />
-
-      {/* Pass the state down to Gallery */}
-      <Gallery isPreloaderDone={isPreloaderDone} />
+      <main className="scroll-content">
+        {/* Pass the state down to Gallery */}
+        <Gallery isPreloaderDone={isPreloaderDone} />
+      </main>
     </ReactLenis>
   );
 }
