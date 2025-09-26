@@ -13,6 +13,12 @@ export default function ProjectDetail({ projects, loading }) {
   const project = projects.find((p) => p.uid === slug);
   if (!project) return <p>Project not found</p>;
 
+  // Combine thumbnail + gallery
+  const galleryWithThumbnail = [
+    project.data.thumbnail,
+    ...(project.data.gallery || []),
+  ].filter(Boolean); // remove any undefined items
+
   return (
     <div className="project-details w-full min-h-screen px-5 py-20">
       {/* Back button */}
@@ -28,22 +34,13 @@ export default function ProjectDetail({ projects, loading }) {
         {asText(project.data.project_name) || "Untitled Project"}
       </h1>
 
-      {/* Thumbnail */}
-      {project.data.thumbnail?.url && (
-        <img
-          src={project.data.thumbnail.url}
-          alt={asText(project.data.project_name) || "Project Thumbnail"}
-          className="w-full max-h-[60vh] object-cover my-5"
-        />
-      )}
-
       {/* Gallery */}
-      {project.data.gallery?.length > 0 && (
-        <div className="flex gap-4 flex-wrap">
-          {project.data.gallery.map((item, index) => (
+      {galleryWithThumbnail.length > 0 && (
+        <div className="flex gap-4 flex-wrap my-5">
+          {galleryWithThumbnail.map((item, index) => (
             <img
               key={index}
-              src={item.image.url}
+              src={item.url || item.image?.url}
               alt={`Gallery image ${index + 1}`}
               className="h-40 object-cover"
             />
