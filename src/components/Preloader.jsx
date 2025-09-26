@@ -26,12 +26,18 @@ export default function Preloader({ setIsPreloaderDone = () => {} }) {
   useEffect(() => {
     if (!containerRef.current || !squareRef.current) return;
 
+    /** 🔒 Disable scrolling while preloader is active */
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const split = new SplitText(containerRef.current.children, {
       type: "chars, words",
     });
 
     const tl = gsap.timeline({
       onComplete: () => {
+        /** 🔓 Re-enable scrolling after preloader finishes */
+        document.body.style.overflow = originalOverflow || "";
         setIsPreloaderDone(true);
       },
     });
@@ -84,6 +90,7 @@ export default function Preloader({ setIsPreloaderDone = () => {} }) {
         ease: "power1.in",
       });
 
+    /** Set up square reveal and image animation */
     gsap.set(squareRef.current, {
       clipPath: "inset(0% 0% 100% 0%)",
     });
@@ -113,6 +120,7 @@ export default function Preloader({ setIsPreloaderDone = () => {} }) {
       });
     };
 
+    /** Handle mouse movement */
     const handleFirstMouseMove = (e) => {
       const { clientX, clientY } = e;
 
@@ -151,10 +159,12 @@ export default function Preloader({ setIsPreloaderDone = () => {} }) {
 
     window.addEventListener("mousemove", handleMouseMove);
 
+    /** Cleanup on unmount */
     return () => {
       window.removeEventListener("mousemove", handleFirstMouseMove);
       window.removeEventListener("mousemove", handleMouseMove);
       split.revert();
+      document.body.style.overflow = originalOverflow || "";
     };
   }, [setIsPreloaderDone]);
 
@@ -183,12 +193,12 @@ export default function Preloader({ setIsPreloaderDone = () => {} }) {
 
         <div
           ref={containerRef}
-          className="flex flex-col items-center overflow-hidden h-[20px] gap-0"
+          className="flex flex-col items-center overflow-hidden h-[20px] gap-0 mix-blend-difference"
         >
-          <span className="text-l text-neutral-600 font-medium leading-5 flex items-center">
+          <span className="text-l text-neutral-50 font-medium leading-5 flex items-center">
             LOADING...
           </span>
-          <span className="text-l text-neutral-600 font-medium leading-5">
+          <span className="text-l text-neutral-50 font-medium leading-5">
             FOLIO ©2025
           </span>
         </div>

@@ -1,29 +1,61 @@
 import { useState, useEffect, useRef } from "react";
 import { useProjects } from "../hooks/useProjects";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Projects({ isPreloaderDone }) {
   const { projects, loading } = useProjects();
   const [selectedProject, setSelectedProject] = useState(null);
   const projectRefs = useRef([]);
 
-  // Animate after preloader finishes
+  /**
+   * --- Initial Stagger Animation After Preloader ---
+   */
   useEffect(() => {
-    if (!loading && projects.length > 0 && isPreloaderDone) {
+    if (
+      !loading &&
+      projects.length > 0 &&
+      isPreloaderDone &&
+      selectedProject === null
+    ) {
       const elements = projectRefs.current;
 
-      // GSAP reveal animation
-      gsap.to(elements, {
+      // Reset all items to hidden state
+      gsap.set(elements, { clipPath: "inset(0% 0% 100% 0%)" });
+
+      // Initial stagger reveal animation
+      const tl = gsap.timeline({
+        onComplete: () => {
+          // After stagger finishes, enable ScrollTrigger animations
+          elements.forEach((el) => {
+            ScrollTrigger.create({
+              trigger: el,
+              start: "top 80%", // when item comes into view
+              onEnter: () => {
+                gsap.to(el, {
+                  clipPath: "inset(0% 0% 0% 0%)",
+                  duration: 1,
+                  ease: "power3.inOut",
+                });
+              },
+            });
+          });
+        },
+      });
+
+      tl.to(elements, {
         clipPath: "inset(0% 0% 0% 0%)",
         duration: 1,
-        ease: "power3.out",
+        ease: "power3.inOut",
         stagger: {
-          amount: 1,
+          amount: 1, // total stagger time
           from: "start",
         },
       });
     }
-  }, [loading, projects, isPreloaderDone]);
+  }, [loading, projects, isPreloaderDone, selectedProject]);
 
   if (loading) return <p>Loading projects...</p>;
 
@@ -72,8 +104,8 @@ export default function Projects({ isPreloaderDone }) {
    * --- Default View: Grid of Thumbnails ---
    */
   return (
-    <section className="gallery w-screen">
-      <div className="projects w-full h-full px-5 py-20">
+    <section className="gallery w-screen px-5 py-20">
+      <div className="projects w-full h-full">
         <div
           className="
             grid
@@ -87,7 +119,7 @@ export default function Projects({ isPreloaderDone }) {
             <div
               key={project.id || index}
               ref={(el) => (projectRefs.current[index] = el)}
-              className="cursor-pointer flex-shrink-0 overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)]" // ✅ hidden by default
+              className="cursor-pointer flex-shrink-0 overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)]"
               onClick={() => setSelectedProject(project)}
             >
               {project.data.thumbnail?.url ? (
