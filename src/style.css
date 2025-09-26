@@ -1,0 +1,17 @@
+@font-face {
+  font-family: Aktura;
+  src: url(/fonts/Aktura-Regular.woff2);
+  display: swap;
+}
+
+@import "tailwindcss";
+
+@theme {
+  --font-secondary: "Aktura";
+}
+
+@layer base {
+  body {
+    @apply w-screen h-screen overflow-x-scroll bg-neutral-50;
+  }
+}
