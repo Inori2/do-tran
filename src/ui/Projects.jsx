@@ -39,20 +39,19 @@ export default function Projects() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [infiniteProjects]);
 
-  // --- Trackpad & Mouse Wheel Scroll ---
+  // --- Trackpad & Mouse Wheel Scroll (Map Vertical to Horizontal) ---
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const handleWheel = (e) => {
-      e.preventDefault(); // prevent vertical page scroll
+      console.log("Wheel event fired. Delta Y:", e.deltaY);
+      // Prevent the default vertical page scroll
+      e.preventDefault();
 
-      // Detect if horizontal (deltaX) or vertical (deltaY) scroll is dominant
-      const scrollAmount =
-        Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-
-      // Move horizontally
-      container.scrollLeft += scrollAmount;
+      // Use deltaY (vertical scroll) as horizontal scroll
+      // Negative deltaY means scroll UP → move LEFT
+      container.scrollLeft += e.deltaY;
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });

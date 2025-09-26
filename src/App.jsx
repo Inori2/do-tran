@@ -1,13 +1,15 @@
 import gsap from "gsap";
 import { ReactLenis } from "lenis/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Preloader from "./components/Preloader";
 import Navbar from "./ui/Navbar";
 import Gallery from "./components/Gallery";
-import Projects from "./ui/Projects";
 
 export default function App() {
   const lenisRef = useRef();
+
+  // ✅ Track if the preloader is done
+  const [isPreloaderDone, setIsPreloaderDone] = useState(false);
 
   useEffect(() => {
     function update(time) {
@@ -21,10 +23,15 @@ export default function App() {
 
   return (
     <ReactLenis root options={{ autoRaf: false }} ref={lenisRef}>
-      <Preloader />
+      {/* Pass setIsPreloaderDone to Preloader so it can notify App */}
+      {!isPreloaderDone && (
+        <Preloader setIsPreloaderDone={setIsPreloaderDone} />
+      )}
+
       <Navbar />
-      {/*       <Gallery /> */}
-      <Projects />
+
+      {/* Pass the state down to Gallery */}
+      <Gallery isPreloaderDone={isPreloaderDone} />
     </ReactLenis>
   );
 }
