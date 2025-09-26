@@ -64,7 +64,7 @@ export default function Projects({ isPreloaderDone }) {
    */
   if (selectedProject) {
     return (
-      <div className="project-details w-screen h-screen px-5 py-20">
+      <div className="project-details w-full h-screen px-5 py-20">
         <button
           onClick={() => setSelectedProject(null)}
           className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300"
@@ -104,22 +104,14 @@ export default function Projects({ isPreloaderDone }) {
    * --- Default View: Grid of Thumbnails ---
    */
   return (
-    <section className="gallery w-screen px-5 py-20">
+    <section className="gallery w-full max-w-[100vw] px-5 py-20">
       <div className="projects w-full h-full">
-        <div
-          className="
-            grid
-            grid-cols-3 sm:grid-cols-7
-            gap-5
-            md:gap-10
-            lg:gap-20
-          "
-        >
+        <div className="w-full grid grid-cols-3 sm:grid-cols-7 gap-5 md:gap-10 lg:gap-20">
           {projects.map((project, index) => (
             <div
               key={project.id || index}
               ref={(el) => (projectRefs.current[index] = el)}
-              className="cursor-pointer flex-shrink-0 overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)]"
+              className="cursor-pointer overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)]"
               onClick={() => setSelectedProject(project)}
             >
               {project.data.thumbnail?.url ? (
