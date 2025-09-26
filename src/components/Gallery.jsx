@@ -1,19 +1,17 @@
-import { useState, useEffect, useRef } from "react";
-import { useProjects } from "../hooks/useProjects";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger, ScrollSmoother } from "gsap/all";
+import { useNavigate } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
-export default function Projects({ isPreloaderDone }) {
-  const { projects, loading } = useProjects();
-  const [selectedProject, setSelectedProject] = useState(null);
+export default function Projects({ isPreloaderDone, projects, loading }) {
+  const navigate = useNavigate();
   const gridRef = useRef(null);
   const projectRefs = useRef([]);
 
   useEffect(() => {
-    if (loading || !isPreloaderDone || !projects.length || selectedProject)
-      return;
+    if (loading || !isPreloaderDone || !projects.length) return;
 
     // ------------------ ScrollSmoother ------------------
     const smoother = ScrollSmoother.create({
@@ -86,46 +84,12 @@ export default function Projects({ isPreloaderDone }) {
       smoother.kill();
       gsap.ticker.remove(updateScale);
     };
-  }, [loading, projects, isPreloaderDone, selectedProject]);
+  }, [loading, projects, isPreloaderDone]);
 
   if (loading) return <p>Loading projects...</p>;
 
-  if (selectedProject) {
-    return (
-      <div className="project-details w-full h-screen px-5 py-20">
-        <button
-          onClick={() => setSelectedProject(null)}
-          className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300"
-        >
-          ← Back
-        </button>
-        <div className="w-full flex flex-col h-2/3 py-5 items-center">
-          {selectedProject.data.thumbnail?.url && (
-            <img
-              src={selectedProject.data.thumbnail.url}
-              alt="Project Thumbnail"
-              className="h-full object-cover"
-            />
-          )}
-        </div>
-        {selectedProject.data.gallery?.length > 0 && (
-          <div className="gallery flex gap-4 h-1/4 px-20 justify-center">
-            {selectedProject.data.gallery.map((item, index) => (
-              <img
-                key={index}
-                src={item.image.url}
-                alt={`Gallery image ${index + 1}`}
-                className="h-40 object-cover"
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
-    <section className="gallery w-full max-w-[100vw] px-5 py-20 overflow-x-hidden bg-neutral-50">
+    <section className="gallery w-full max-w-[100vw] px-5 py-20 overflow-x-hidden bg-neutral-50 scroll-content">
       <div
         ref={gridRef}
         className="projects w-full h-full grid grid-cols-3 sm:grid-cols-7 gap-5 md:gap-10 lg:gap-20"
@@ -135,7 +99,7 @@ export default function Projects({ isPreloaderDone }) {
             key={project.id || index}
             ref={(el) => (projectRefs.current[index] = el)}
             className="grid__item cursor-pointer overflow-hidden relative [clip-path:inset(0%_0%_100%_0%)] transform-gpu"
-            onClick={() => setSelectedProject(project)}
+            onClick={() => navigate(`/projects/${project.uid}`)}
           >
             {project.data.thumbnail?.url ? (
               <img
