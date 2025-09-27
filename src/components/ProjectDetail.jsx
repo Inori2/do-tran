@@ -7,7 +7,12 @@ export default function ProjectDetail({ projects, loading }) {
 
   // Wait until projects are loaded
   if (loading) return <p>Loading project...</p>;
-  if (!projects || projects.length === 0) return <p>Loading project data...</p>;
+  if (!projects || projects.length === 0)
+    return (
+      <div className="w-screen h-screen bg-neutral-50 flex items-center">
+        <p>Loading project data...</p>
+      </div>
+    );
 
   // Find project by slug
   const project = projects.find((p) => p.uid === slug);

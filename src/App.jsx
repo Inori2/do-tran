@@ -7,6 +7,7 @@ import Navbar from "./ui/Navbar";
 import Gallery from "./components/Gallery";
 import ProjectDetail from "./components/ProjectDetail";
 import { useProjects } from "./hooks/useProjects"; // import hook here
+import Hero from "./components/Hero";
 
 export default function App() {
   const lenisRef = useRef();
@@ -47,6 +48,7 @@ export default function App() {
           />
         </Routes>
       </main>
+      <Hero />
     </ReactLenis>
   );
 }

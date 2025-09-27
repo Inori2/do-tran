@@ -14,12 +14,12 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
     if (loading || !isPreloaderDone || !projects.length) return;
 
     // ------------------ ScrollSmoother ------------------
-    const smoother = ScrollSmoother.create({
+    /*     const smoother = ScrollSmoother.create({
       smooth: 1,
       effects: true,
       normalizeScroll: true,
       content: ".scroll-content", // ONLY scrollable content
-    });
+    }); */
 
     const items = projectRefs.current;
 
@@ -49,9 +49,9 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
       stagger: { amount: 1, from: "start" },
     });
 
-    // ------------------ Lag per item ------------------
+    /*     // ------------------ Lag per item ------------------
     const baseLag = 0.5;
-    const lagScale = 0.13;
+    const lagScale = 0.1;
     items.forEach((item, i) => {
       const lag = baseLag + (i % 3) * lagScale; // approximate column lag
       smoother.effects(item, { speed: 1, lag });
@@ -60,7 +60,7 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
     // ------------------ Scroll velocity scaling ------------------
     const minScaleX = 0.7;
     const maxScaleY = 1.7;
-    const threshold = 700;
+    const threshold = 200;
     const scrollSensitivity = 4000;
 
     const updateScale = () => {
@@ -78,12 +78,12 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
       gridRef.current.style.setProperty("--to", origin);
     };
 
-    gsap.ticker.add(updateScale);
+    gsap.ticker.add(updateScale); */
 
-    return () => {
+    /*     return () => {
       smoother.kill();
       gsap.ticker.remove(updateScale);
-    };
+    }; */
   }, [loading, projects, isPreloaderDone]);
 
   if (loading) return <p>Loading projects...</p>;
