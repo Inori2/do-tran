@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger, ScrollSmoother } from "gsap/all";
 import { useNavigate } from "react-router-dom";
+import Hero from "./Hero";
 
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
@@ -89,7 +90,7 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
   if (loading) return <p>Loading projects...</p>;
 
   return (
-    <section className="gallery w-full max-w-[100vw] px-5 py-20 overflow-x-hidden bg-neutral-50 scroll-content">
+    <section className="gallery w-screen max-w-[100vw] px-5 py-20 bg-neutral-50 scroll-content">
       <div
         ref={gridRef}
         className="projects w-full h-full grid grid-cols-3 sm:grid-cols-7 gap-5 md:gap-10 lg:gap-20"
@@ -115,6 +116,7 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
           </div>
         ))}
       </div>
+      <Hero />
     </section>
   );
 }
