@@ -11,8 +11,10 @@ export default function ProjectDetail({ projects, loading }) {
   // Refs for animation
   const highlightRef = useRef(null);
   const galleryRef = useRef(null);
+  const imageRef = useRef(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [animating, setAnimating] = useState(false);
 
   // Find project by slug
   const project = projects?.find((p) => p.uid === slug);
@@ -31,7 +33,7 @@ export default function ProjectDetail({ projects, loading }) {
 
   const selectedImage = galleryWithThumbnail[selectedIndex];
 
-  // --- ✨ GSAP animations for highlight & thumbnails ---
+  // --- ✨ Initial GSAP animations for highlight & thumbnails ---
   useEffect(() => {
     if (!loading && project) {
       const tl = gsap.timeline({
@@ -42,7 +44,7 @@ export default function ProjectDetail({ projects, loading }) {
       tl.fromTo(
         highlightRef.current,
         { clipPath: "inset(0% 0% 100% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.2 }
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 1 }
       );
 
       // Thumbnail stagger reveal
@@ -54,16 +56,52 @@ export default function ProjectDetail({ projects, loading }) {
           {
             clipPath: "inset(0% 0% 0% 0%)",
             duration: 0.6,
-            stagger: 0.1, // 👈 each thumbnail appears one after another
+            stagger: 0.1,
           },
-          "-=0.6" // overlap with highlight animation for smoother flow
+          "-=0.6"
         );
       }
     }
   }, [loading, project, slug]);
-  // ----------------------------------------------------
+  // -------------------------------------------------------------
 
-  // Handle loading state
+  // --- 🔄 Handle thumbnail click animation ---
+  const handleThumbnailClick = (idx) => {
+    if (animating || idx === selectedIndex) return;
+    setAnimating(true);
+
+    const currentImage = imageRef.current;
+    const newSrc =
+      galleryWithThumbnail[idx]?.url || galleryWithThumbnail[idx]?.image?.url;
+
+    const tl = gsap.timeline({
+      defaults: { ease: "cubic-bezier(0.76, 0, 0.24, 1)" },
+      onComplete: () => setAnimating(false),
+    });
+
+    // 1️⃣ Close current image
+    tl.to(highlightRef.current, {
+      clipPath: "inset(100% 0% 0% 0%)",
+      transformOrigin: "top center",
+      duration: 0.5,
+    });
+
+    // 2️⃣ Swap image once closed
+    tl.add(() => {
+      currentImage.src = newSrc;
+      setSelectedIndex(idx);
+    });
+
+    // 3️⃣ Reveal new image
+    tl.to(highlightRef.current, {
+      clipPath: "inset(0% 0% 0% 0%)",
+
+      duration: 0.8,
+    });
+  };
+  // -------------------------------------------------------------
+
+  // Handle loading states
   if (loading) {
     return (
       <div className="w-screen h-screen bg-neutral-50 flex items-center justify-center">
@@ -72,7 +110,6 @@ export default function ProjectDetail({ projects, loading }) {
     );
   }
 
-  // Handle empty projects
   if (!projects || projects.length === 0) {
     return (
       <div className="w-screen h-screen bg-neutral-50 flex items-center justify-center">
@@ -81,7 +118,6 @@ export default function ProjectDetail({ projects, loading }) {
     );
   }
 
-  // Handle project not found
   if (!project) {
     return (
       <div className="w-screen h-screen bg-neutral-50 flex items-center justify-center">
@@ -108,6 +144,7 @@ export default function ProjectDetail({ projects, loading }) {
           style={{ clipPath: "inset(0% 0% 100% 0%)" }}
         >
           <img
+            ref={imageRef}
             src={selectedImage?.url || selectedImage?.image?.url}
             alt={asText(project.data.project_name) || "Project image"}
             className="max-w-[50vw] h-full object-cover shadow-md transition-all duration-500 ease-in-out"
@@ -126,7 +163,7 @@ export default function ProjectDetail({ projects, loading }) {
               key={idx}
               src={item.url || item.image?.url}
               alt={`Gallery image ${idx + 1}`}
-              onClick={() => setSelectedIndex(idx)}
+              onClick={() => handleThumbnailClick(idx)}
               className={`h-20 w-20 object-cover cursor-pointer transition duration-300 ${
                 idx === selectedIndex
                   ? "ring-4 ring-neutral-900 scale-105"
@@ -138,7 +175,10 @@ export default function ProjectDetail({ projects, loading }) {
       )}
 
       {/* Hero */}
-      <Hero Text={asText(project.data.project_name) || "Untitled Project"} />
+      <Hero
+        Text={asText(project.data.project_name) || "Untitled Project"}
+        isPreloaderDone={true}
+      />
     </div>
   );
 }

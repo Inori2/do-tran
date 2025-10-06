@@ -56,7 +56,7 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
           </div>
         ))}
       </div>
-      <Hero />
+      <Hero isPreloaderDone={isPreloaderDone} />
     </section>
   );
 }
