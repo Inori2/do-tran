@@ -14,77 +14,33 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
   useEffect(() => {
     if (loading || !isPreloaderDone || !projects.length) return;
 
-    // ------------------ ScrollSmoother ------------------
-    /*     const smoother = ScrollSmoother.create({
-      smooth: 1,
-      effects: true,
-      normalizeScroll: true,
-      content: ".scroll-content", // ONLY scrollable content
-    }); */
-
     const items = projectRefs.current;
 
-    // ------------------ Initial Stagger Reveal ------------------
     gsap.set(items, { clipPath: "inset(0% 0% 100% 0%)" });
-    const tl = gsap.timeline({
-      onComplete: () => {
-        items.forEach((el) => {
-          ScrollTrigger.create({
-            trigger: el,
-            start: "top 80%",
-            onEnter: () => {
-              gsap.to(el, {
-                clipPath: "inset(0% 0% 0% 0%)",
-                duration: 1,
-                ease: "power3.inOut",
-              });
-            },
+
+    /*     items.forEach((el) => {
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top 80%",
+        end: "bottom 100%",
+        onEnter: () => {
+          gsap.to(el, {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration: 1,
+            ease: "power3.inOut",
           });
-        });
-      },
-    });
-    tl.to(items, {
+        },
+        markers: true,
+      });
+    }); */
+
+    gsap.to(items, {
       clipPath: "inset(0% 0% 0% 0%)",
-      duration: 1,
-      ease: "power3.inOut",
-      stagger: { amount: 1, from: "start" },
+      duration: 0.6,
+      ease: "cubic-bezier(0.76, 0, 0.24, 1)",
+      stagger: { amount: 1.5, from: "start" },
+      onComplete: () => ScrollTrigger.refresh(),
     });
-
-    /*     // ------------------ Lag per item ------------------
-    const baseLag = 0.5;
-    const lagScale = 0.1;
-    items.forEach((item, i) => {
-      const lag = baseLag + (i % 3) * lagScale; // approximate column lag
-      smoother.effects(item, { speed: 1, lag });
-    });
-
-    // ------------------ Scroll velocity scaling ------------------
-    const minScaleX = 0.7;
-    const maxScaleY = 1.7;
-    const threshold = 200;
-    const scrollSensitivity = 4000;
-
-    const updateScale = () => {
-      const rawVel = smoother.getVelocity();
-      const absVel = Math.abs(rawVel);
-      const vRaw = Math.max(0, absVel - threshold);
-      const v = Math.min(vRaw / scrollSensitivity, 1);
-
-      const si = 1 + (minScaleX - 1) * v;
-      const sy = 1 + (maxScaleY - 1) * v;
-      const origin = rawVel < 0 ? "50% 0%" : "50% 100%";
-
-      gridRef.current.style.setProperty("--si", si);
-      gridRef.current.style.setProperty("--sy", sy);
-      gridRef.current.style.setProperty("--to", origin);
-    };
-
-    gsap.ticker.add(updateScale); */
-
-    /*     return () => {
-      smoother.kill();
-      gsap.ticker.remove(updateScale);
-    }; */
   }, [loading, projects, isPreloaderDone]);
 
   if (loading) return <p>Loading projects...</p>;
