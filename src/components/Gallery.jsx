@@ -18,22 +18,6 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
 
     gsap.set(items, { clipPath: "inset(0% 0% 100% 0%)" });
 
-    /*     items.forEach((el) => {
-      ScrollTrigger.create({
-        trigger: el,
-        start: "top 80%",
-        end: "bottom 100%",
-        onEnter: () => {
-          gsap.to(el, {
-            clipPath: "inset(0% 0% 0% 0%)",
-            duration: 1,
-            ease: "power3.inOut",
-          });
-        },
-        markers: true,
-      });
-    }); */
-
     gsap.to(items, {
       clipPath: "inset(0% 0% 0% 0%)",
       duration: 0.6,

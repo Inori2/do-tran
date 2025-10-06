@@ -7,8 +7,6 @@ import Navbar from "./ui/Navbar";
 import Gallery from "./components/Gallery";
 import ProjectDetail from "./components/ProjectDetail";
 import { useProjects } from "./hooks/useProjects"; // import hook here
-import Hero from "./components/Hero";
-import TodoApp from "./components/DailyChallenges";
 
 export default function App() {
   const lenisRef = useRef();
