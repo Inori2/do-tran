@@ -7,6 +7,7 @@ import Navbar from "./ui/Navbar";
 import Gallery from "./components/Gallery";
 import ProjectDetail from "./components/ProjectDetail";
 import { useProjects } from "./hooks/useProjects"; // import hook here
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 export default function App() {
   const lenisRef = useRef();
@@ -22,6 +23,18 @@ export default function App() {
     gsap.ticker.add(update);
     return () => gsap.ticker.remove(update);
   }, []);
+
+  useEffect(() => {
+    if (isPreloaderDone) {
+      // Wait a tick to ensure the DOM is visible
+      setTimeout(() => {
+        lenisRef.current?.lenis?.resize(); // Recalculate Lenis scroll size
+        gsap.delayedCall(0.2, () => {
+          ScrollTrigger.refresh(true); // Refresh all GSAP triggers
+        });
+      }, 100);
+    }
+  }, [isPreloaderDone]);
 
   return (
     <ReactLenis root options={{ autoRaf: false }} ref={lenisRef}>
