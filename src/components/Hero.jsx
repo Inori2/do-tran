@@ -46,7 +46,11 @@ export default function Hero({ Text = "Do Tran", isPreloaderDone = false }) {
           ))}
 
           <div className="item col-span-1 w-full place-items-center">
-            <SocialButton Text="Made by Sang" ref={socialRef} />
+            <SocialButton
+              Text="Made by Sang"
+              ref={socialRef}
+              Link="https://madebysang.com"
+            />
           </div>
         </div>
       </div>
