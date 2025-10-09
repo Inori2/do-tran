@@ -29,7 +29,7 @@ export default function Hero({ Text = "Do Tran", isPreloaderDone = false }) {
       <div className="grid grid-cols-2 w-full items-end">
         <div
           ref={headingRef}
-          className="heading font-secondary text-8xl lg:text-9xl text-neutral-50 select-none leading-20 col-span-1 mr-auto"
+          className="heading font-secondary text-8xl lg:text-9xl text-neutral-50 select-none leading-20 col-span-2 lg:col-span-1 mr-auto"
         >
           {Text}
         </div>

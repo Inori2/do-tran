@@ -127,7 +127,7 @@ export default function ProjectDetail({ projects, loading }) {
   }
 
   return (
-    <div className="project-details w-screen h-screen min-h-screen px-5 py-20 z-10 relative bg-neutral-50 overflow-hidden flex flex-col lg:block">
+    <div className="project-details w-screen h-screen min-h-screen px-5 py-20 z-10 relative bg-neutral-50 flex flex-col lg:block">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
@@ -154,23 +154,25 @@ export default function ProjectDetail({ projects, loading }) {
 
       {/* Thumbnails gallery */}
       {galleryWithThumbnail.length > 1 && (
-        <div
-          ref={galleryRef}
-          className="thumbnail-gallery flex pb-20 lg:pb-5 gap-4 w-fit justify-center overflow-hidden overflow-x-scroll"
-        >
-          {galleryWithThumbnail.map((item, idx) => (
-            <img
-              key={idx}
-              src={item.url || item.image?.url}
-              alt={`Gallery image ${idx + 1}`}
-              onClick={() => handleThumbnailClick(idx)}
-              className={`h-20 w-20 object-cover cursor-pointer transition duration-300 ${
-                idx === selectedIndex
-                  ? "ring-4 ring-neutral-900 scale-105"
-                  : "hover:opacity-80"
-              }`}
-            />
-          ))}
+        <div className="w-full overflow-x-auto overflow-y-visible touch-pan-x">
+          <div
+            ref={galleryRef}
+            className="thumbnail-gallery flex pb-20 lg:pb-5 gap-4 w-max pr-5 justify-center"
+          >
+            {galleryWithThumbnail.map((item, idx) => (
+              <img
+                key={idx}
+                src={item.url || item.image?.url}
+                alt={`Gallery image ${idx + 1}`}
+                onClick={() => handleThumbnailClick(idx)}
+                className={`h-20 w-20 object-cover cursor-pointer transition duration-300 ${
+                  idx === selectedIndex
+                    ? "ring-4 ring-neutral-900 scale-105"
+                    : "hover:opacity-80"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       )}
 
