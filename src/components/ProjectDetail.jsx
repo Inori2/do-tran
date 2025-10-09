@@ -127,11 +127,11 @@ export default function ProjectDetail({ projects, loading }) {
   }
 
   return (
-    <div className="project-details w-screen h-screen min-h-screen px-5 py-20 z-10 relative bg-neutral-50 overflow-hidden">
+    <div className="project-details w-screen h-screen min-h-screen px-5 py-20 z-10 relative bg-neutral-50 overflow-hidden flex flex-col lg:block">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 transition"
+        className="mb-4 px-4 py-2 w-fit bg-gray-200 hover:bg-gray-300 transition"
       >
         ← Back
       </button>
@@ -140,7 +140,7 @@ export default function ProjectDetail({ projects, loading }) {
       {selectedImage && (
         <div
           ref={highlightRef}
-          className="highlight-image w-full h-2/3 mb-6 flex justify-center items-center overflow-hidden"
+          className="highlight-image my-auto w-full lg:h-2/3 lg:mb-6 flex justify-center items-center overflow-hidden"
           style={{ clipPath: "inset(0% 0% 100% 0%)" }}
         >
           <img
@@ -156,7 +156,7 @@ export default function ProjectDetail({ projects, loading }) {
       {galleryWithThumbnail.length > 1 && (
         <div
           ref={galleryRef}
-          className="thumbnail-gallery flex gap-4 w-full justify-center overflow-hidden"
+          className="thumbnail-gallery flex pb-20 lg:pb-5 gap-4 w-fit justify-center overflow-hidden overflow-x-scroll"
         >
           {galleryWithThumbnail.map((item, idx) => (
             <img

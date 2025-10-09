@@ -34,7 +34,7 @@ export default function Hero({ Text = "Do Tran", isPreloaderDone = false }) {
           {Text}
         </div>
 
-        <div className="infor-wrapper w-full grid grid-cols-3 gap-20 col-span-1 items-center">
+        <div className="infor-wrapper w-full hidden lg:grid lg:grid-cols-3 gap-20 col-span-1 items-center">
           {["PHOTOGRAPHER", "FOLIO ©2025"].map((text, i) => (
             <div
               key={i}
