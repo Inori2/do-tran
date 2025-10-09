@@ -10,6 +10,7 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
   const navigate = useNavigate();
   const gridRef = useRef(null);
   const projectRefs = useRef([]);
+  const imgRef = useRef([]);
 
   useEffect(() => {
     if (loading || !isPreloaderDone || !projects.length) return;
@@ -24,6 +25,36 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
       ease: "cubic-bezier(0.76, 0, 0.24, 1)",
       stagger: { amount: 1.5, from: "start" },
       onComplete: () => ScrollTrigger.refresh(),
+    });
+
+    projectRefs.current.forEach((item, i) => {
+      const img = imgRef.current[i];
+
+      gsap.set(item, { position: "relative" });
+      gsap.set(img, { transformOrigin: "center center" });
+
+      const overlay = gsap.to(item, {
+        backgroundColor: "rgba(0,0,0,0.2)",
+        paused: true,
+        duration: 0.4,
+      });
+
+      const scaleUp = gsap.to(img, {
+        scale: 1.05,
+        paused: true,
+        duration: 0.6,
+        ease: "power3.out",
+      });
+
+      item.addEventListener("mouseenter", () => {
+        overlay.play();
+        scaleUp.play();
+      });
+
+      item.addEventListener("mouseleave", () => {
+        overlay.reverse();
+        scaleUp.reverse();
+      });
     });
   }, [loading, projects, isPreloaderDone]);
 
@@ -47,6 +78,7 @@ export default function Projects({ isPreloaderDone, projects, loading }) {
                 src={project.data.thumbnail.url}
                 alt="Thumbnail"
                 className="w-full h-full object-cover"
+                ref={(el) => (imgRef.current[index] = el)}
               />
             ) : (
               <div className="w-full h-full bg-gray-200 flex items-center justify-center">

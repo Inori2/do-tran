@@ -9,40 +9,15 @@ export default function Hero({ Text = "Do Tran", isPreloaderDone = false }) {
   const socialRef = useRef(null);
 
   useEffect(() => {
+    gsap.set(heroRef.current, {
+      autoAlpha: 0,
+    });
     if (isPreloaderDone && heroRef.current) {
-      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-
-      // make sure everything starts hidden
-      gsap.set([headingRef.current, infoRef.current, socialRef.current], {
-        yPercent: 100,
-        opacity: 0,
+      gsap.to(heroRef.current, {
+        autoAlpha: 1,
+        duration: 1,
+        ease: "power3.out",
       });
-
-      // stagger in sequence
-      tl.to(headingRef.current, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 1.2,
-      })
-        .to(
-          infoRef.current,
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.2,
-          },
-          "-=0.6" // overlap with heading animation slightly
-        )
-        .to(
-          socialRef.current,
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.5,
-          },
-          "-=0.5"
-        );
     }
   }, [isPreloaderDone]);
 
@@ -70,11 +45,8 @@ export default function Hero({ Text = "Do Tran", isPreloaderDone = false }) {
             </div>
           ))}
 
-          <div
-            ref={socialRef}
-            className="item col-span-1 w-full place-items-center"
-          >
-            <SocialButton Text="Made by Sang" />
+          <div className="item col-span-1 w-full place-items-center">
+            <SocialButton Text="Made by Sang" ref={socialRef} />
           </div>
         </div>
       </div>
