@@ -154,10 +154,10 @@ export default function ProjectDetail({ projects, loading }) {
 
       {/* Thumbnails gallery */}
       {galleryWithThumbnail.length > 1 && (
-        <div className="w-full overflow-x-auto overflow-y-visible touch-pan-x">
+        <div className="w-full overflow-x-auto overflow-y-visible touch-pan-x justify-center flex">
           <div
             ref={galleryRef}
-            className="thumbnail-gallery flex pb-20 lg:pb-5 gap-4 w-max pr-5 justify-center"
+            className="thumbnail-gallery flex pb-20 lg:pb-5 gap-4 w-max pr-5 justify-center items-center place-content-center"
           >
             {galleryWithThumbnail.map((item, idx) => (
               <img
