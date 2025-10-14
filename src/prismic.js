@@ -1,11 +1,11 @@
 // src/prismic.js
 import * as prismic from "@prismicio/client";
 
-export const repositoryName = "do-tran"; // replace with your Prismic repo
+// load repo name and access token from environment variables
+export const repositoryName = import.meta.env.VITE_PRISMIC_REPO_NAME;
+export const accessToken = import.meta.env.VITE_PRISMIC_ACCESS_TOKEN;
 
-// Create a client
+// create the client using env variables
 export const client = prismic.createClient(repositoryName, {
-  // If you have an access token, put it here
-  accessToken:
-    "MC5hTllWNUJJQUFDSUFZX09M.A2xQ77-977-9Ljzvv73vv73vv70ZdkAD77-9fu-_vSjvv73vv73vv70477-9dmzvv70MP--_vRlqPw",
+  accessToken,
 });
